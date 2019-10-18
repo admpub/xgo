@@ -26,10 +26,10 @@ var layers = []struct {
 	tag string
 	dir string
 }{
-	{"crazymax/xgo:base", "base"},
-	{"crazymax/xgo:1.6.2", "go-1.6.2"},
-	{"crazymax/xgo:1.6.x", "go-1.6.x"},
-	{"crazymax/xgo:latest", "go-latest"},
+	{"admpub/xgo:base", "base"},
+	{"admpub/xgo:1.6.2", "go-1.6.2"},
+	{"admpub/xgo:1.6.x", "go-1.6.x"},
+	{"admpub/xgo:latest", "go-latest"},
 }
 
 // tests defaines all the input test cases and associated arguments the cross

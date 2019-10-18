@@ -1,4 +1,4 @@
-FROM crazymax/xgo:base
+FROM admpub/xgo:base
 
 ENV GO_VERSION 185
 

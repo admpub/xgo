@@ -27,8 +27,8 @@ jobs:
         name: Docker Build
         run: |
           docker build \
-            --tag "crazymax/xgo:base" \
-            --tag "quay.io/crazymax/xgo:base" \
+            --tag "admpub/xgo:base" \
+            --tag "quay.io/admpub/xgo:base" \
             --file ./docker/base/Dockerfile ./docker/base
       -
         name: Docker Login
@@ -43,8 +43,8 @@ jobs:
         name: Docker Push
         if: success() && startsWith(github.ref, 'refs/tags/base-')
         run: |
-          docker push crazymax/xgo
-          docker push quay.io/crazymax/xgo
+          docker push admpub/xgo
+          docker push quay.io/admpub/xgo
       -
         name: Clear
         if: always()

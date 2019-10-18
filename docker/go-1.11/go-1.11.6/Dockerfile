@@ -1,4 +1,4 @@
-FROM crazymax/xgo:base
+FROM admpub/xgo:base
 
 # Configure the root Go distribution and bootstrap based on it
 ENV GO_VERSION 1116
