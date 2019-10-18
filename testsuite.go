@@ -39,8 +39,8 @@ var tests = []struct {
 	args []string
 }{
 	// Tiny test cases to smoke test cross compilations
-	{"github.com/crazy-max/xgo/tests/embedded_c", nil},
-	{"github.com/crazy-max/xgo/tests/embedded_cpp", nil},
+	{"github.com/admpub/xgo/tests/embedded_c", nil},
+	{"github.com/admpub/xgo/tests/embedded_cpp", nil},
 
 	// Baseline projects to ensure minimal requirements
 	//{"github.com/project-iris/iris", nil}, // Deps failed, disable

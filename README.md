@@ -1,7 +1,7 @@
 <p align="center">
-  <a href="https://github.com/crazy-max/xgo/releases/latest"><img src="https://img.shields.io/github/release/crazy-max/xgo.svg?style=flat-square" alt="GitHub release"></a>
-  <a href="https://github.com/crazy-max/xgo/releases/latest"><img src="https://img.shields.io/github/downloads/crazy-max/xgo/total.svg?style=flat-square" alt="Total downloads"></a>
-  <a href="https://github.com/crazy-max/xgo/actions"><img src="https://github.com/crazy-max/xgo/workflows/xgo/badge.svg" alt="Build Status"></a>
+  <a href="https://github.com/admpub/xgo/releases/latest"><img src="https://img.shields.io/github/release/admpub/xgo.svg?style=flat-square" alt="GitHub release"></a>
+  <a href="https://github.com/admpub/xgo/releases/latest"><img src="https://img.shields.io/github/downloads/admpub/xgo/total.svg?style=flat-square" alt="Total downloads"></a>
+  <a href="https://github.com/admpub/xgo/actions"><img src="https://github.com/admpub/xgo/workflows/xgo/badge.svg" alt="Build Status"></a>
   <a href="https://hub.docker.com/r/admpub/xgo/"><img src="https://img.shields.io/docker/stars/admpub/xgo.svg?style=flat-square" alt="Docker Stars"></a>
   <a href="https://hub.docker.com/r/admpub/xgo/"><img src="https://img.shields.io/docker/pulls/admpub/xgo.svg?style=flat-square" alt="Docker Pulls"></a>
   <a href="https://quay.io/repository/admpub/xgo"><img src="https://quay.io/repository/admpub/xgo/status?style=flat-square" alt="Docker Repository on Quay"></a>
@@ -13,9 +13,9 @@
 
 This repository is a fork of [karalabe/xgo](https://github.com/karalabe/xgo) to push images and [tags to an unique docker repository](https://hub.docker.com/r/admpub/xgo/tags/?page=1&ordering=last_updated) to make things more consistent for users.
 
-I use [GitHub Actions](https://github.com/crazy-max/xgo/actions) and his [matrix strategy](https://help.github.com/en/articles/workflow-syntax-for-github-actions#jobsjob_idstrategymatrix) to build the images instead of using automated builds of Docker Hub (see [workflows](.github/workflows) folder).
+I use [GitHub Actions](https://github.com/admpub/xgo/actions) and his [matrix strategy](https://help.github.com/en/articles/workflow-syntax-for-github-actions#jobsjob_idstrategymatrix) to build the images instead of using automated builds of Docker Hub (see [workflows](.github/workflows) folder).
 
-This also creates a [standalone xgo executable](https://github.com/crazy-max/xgo/releases) that can be used on many platforms.
+This also creates a [standalone xgo executable](https://github.com/admpub/xgo/releases) that can be used on many platforms.
 
 ## About
 
