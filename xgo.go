@@ -1,5 +1,6 @@
 // Go CGO cross compiler
 // Copyright (c) 2014 Péter Szilágyi. All rights reserved.
+// Copyright (c) 2019 CrazyMax
 //
 // Released under the MIT license.
 
@@ -16,35 +17,22 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"os/user"
 	"path/filepath"
 	"strconv"
 	"strings"
 )
 
-// Path where to cache external dependencies
-var depsCache string
-
-func init() {
-	// Initialize the external dependency cache path to a few possible locations
-	if home := os.Getenv("HOME"); home != "" {
-		depsCache = filepath.Join(home, ".xgo-cache")
-		return
-	}
-	if user, err := user.Current(); user != nil && err == nil && user.HomeDir != "" {
-		depsCache = filepath.Join(user.HomeDir, ".xgo-cache")
-		return
-	}
-	depsCache = filepath.Join(os.TempDir(), "xgo-cache")
-}
+var version = "dev"
+var depsCache = filepath.Join(os.TempDir(), "xgo-cache")
 
 // Cross compilation docker containers
-var dockerBase = "karalabe/xgo-base"
-var dockerDist = "karalabe/xgo-"
+var dockerBase = "crazymax/xgo:base"
+var dockerDist = "crazymax/xgo:"
 
 // Command line arguments to fine tune the compilation
 var (
 	goVersion   = flag.String("go", "latest", "Go release to use for cross compilation")
+	goProxy     = flag.String("goproxy", "", "Set a Global Proxy for Go Modules")
 	srcPackage  = flag.String("pkg", "", "Sub-package to build if not root import")
 	srcRemote   = flag.String("remote", "", "Version control remote repository to build")
 	srcBranch   = flag.String("branch", "", "Version control branch to build")
@@ -89,6 +77,9 @@ type BuildFlags struct {
 }
 
 func main() {
+	defer fmt.Println("🏁 Finished!")
+	fmt.Printf("🚀 Start xgo %s\n", version)
+
 	// Retrieve the CLI flags and the execution environment
 	flag.Parse()
 
@@ -102,11 +93,11 @@ func main() {
 	if !xgoInXgo {
 		// Ensure docker is available
 		if err := checkDocker(); err != nil {
-			log.Fatalf("Failed to check docker installation: %v.", err)
+			log.Fatalf("❌ Failed to check docker installation: %v.", err)
 		}
 		// Validate the command line arguments
 		if len(flag.Args()) != 1 {
-			log.Fatalf("Usage: %s [options] <go import path>", os.Args[0])
+			log.Fatalf("👉 Usage: %s [options] <go import path>", os.Args[0])
 		}
 		// Select the image to use, either official or custom
 		image = dockerDist + *goVersion
@@ -117,20 +108,20 @@ func main() {
 		found, err := checkDockerImage(image)
 		switch {
 		case err != nil:
-			log.Fatalf("Failed to check docker image availability: %v.", err)
+			log.Fatalf("❌ Failed to check docker image availability: %v.", err)
 		case !found:
 			fmt.Println("not found!")
 			if err := pullDockerImage(image); err != nil {
-				log.Fatalf("Failed to pull docker image from the registry: %v.", err)
+				log.Fatalf("❌ Failed to pull docker image from the registry: %v.", err)
 			}
 		default:
-			fmt.Println("found.")
+			fmt.Println("🎉 Docker image found!")
 		}
 	}
 	// Cache all external dependencies to prevent always hitting the internet
 	if *crossDeps != "" {
 		if err := os.MkdirAll(depsCache, 0751); err != nil {
-			log.Fatalf("Failed to create dependency cache: %v.", err)
+			log.Fatalf("❌ Failed to create dependency cache: %v.", err)
 		}
 		// Download all missing dependencies
 		for _, dep := range strings.Split(*crossDeps, " ") {
@@ -138,26 +129,26 @@ func main() {
 				path := filepath.Join(depsCache, filepath.Base(url))
 
 				if _, err := os.Stat(path); err != nil {
-					fmt.Printf("Downloading new dependency: %s...\n", url)
+					fmt.Printf("⬇️ Downloading new dependency: %s...\n", url)
 
 					out, err := os.Create(path)
 					if err != nil {
-						log.Fatalf("Failed to create dependency file: %v.", err)
+						log.Fatalf("❌ Failed to create dependency file: %v.", err)
 					}
 					res, err := http.Get(url)
 					if err != nil {
-						log.Fatalf("Failed to retrieve dependency: %v.", err)
+						log.Fatalf("❌ Failed to retrieve dependency: %v.", err)
 					}
 					defer res.Body.Close()
 
 					if _, err := io.Copy(out, res.Body); err != nil {
-						log.Fatalf("Failed to download dependency: %v", err)
+						log.Fatalf("❌ Failed to download dependency: %v", err)
 					}
 					out.Close()
 
-					fmt.Printf("New dependency cached: %s.\n", path)
+					fmt.Printf("✨ New dependency cached: %s.\n", path)
 				} else {
-					fmt.Printf("Dependency already cached: %s.\n", path)
+					fmt.Printf("🤝 Dependency already cached: %s.\n", path)
 				}
 			}
 		}
@@ -183,12 +174,12 @@ func main() {
 	}
 	folder, err := os.Getwd()
 	if err != nil {
-		log.Fatalf("Failed to retrieve the working directory: %v.", err)
+		log.Fatalf("❌ Failed to retrieve the working directory: %v.", err)
 	}
 	if *outFolder != "" {
 		folder, err = filepath.Abs(*outFolder)
 		if err != nil {
-			log.Fatalf("Failed to resolve destination path (%s): %v.", *outFolder, err)
+			log.Fatalf("❌ Failed to resolve destination path (%s): %v.", *outFolder, err)
 		}
 	}
 	// Execute the cross compilation, either in a container or the current system
@@ -198,13 +189,13 @@ func main() {
 		err = compileContained(config, flags, folder)
 	}
 	if err != nil {
-		log.Fatalf("Failed to cross compile package: %v.", err)
+		log.Fatalf("❌ Failed to cross compile package: %v.", err)
 	}
 }
 
 // Checks whether a docker installation can be found and is functional.
 func checkDocker() error {
-	fmt.Println("Checking docker installation...")
+	fmt.Println("🐳 Checking docker installation...")
 	if err := run(exec.Command("docker", "version")); err != nil {
 		return err
 	}
@@ -214,7 +205,7 @@ func checkDocker() error {
 
 // Checks whether a required docker image is available locally.
 func checkDockerImage(image string) (bool, error) {
-	fmt.Printf("Checking for required docker image %s... ", image)
+	fmt.Printf("🐳 Checking for required docker image %s... ", image)
 	out, err := exec.Command("docker", "images", "--no-trunc").Output()
 	if err != nil {
 		return false, err
@@ -224,7 +215,7 @@ func checkDockerImage(image string) (bool, error) {
 
 // Pulls an image from the docker registry.
 func pullDockerImage(image string) error {
-	fmt.Printf("Pulling %s from docker registry...\n", image)
+	fmt.Printf("🐳 Pulling %s from docker registry...\n", image)
 	return run(exec.Command("docker", "pull", image))
 }
 
@@ -233,53 +224,62 @@ func pullDockerImage(image string) error {
 func compile(image string, config *ConfigFlags, flags *BuildFlags, folder string) error {
 	// If a local build was requested, find the import path and mount all GOPATH sources
 	locals, mounts, paths := []string{}, []string{}, []string{}
+	var usesModules bool
 	if strings.HasPrefix(config.Repository, string(filepath.Separator)) || strings.HasPrefix(config.Repository, ".") {
 		// Resolve the repository import path from the file path
 		config.Repository = resolveImportPath(config.Repository)
 
+		// Determine if this is a module-based repository
+		var modFile = config.Repository + "/go.mod"
+		_, err := os.Stat(modFile)
+		usesModules = !os.IsNotExist(err)
+
 		// Iterate over all the local libs and export the mount points
-		if os.Getenv("GOPATH") == "" {
-			log.Fatalf("No $GOPATH is set or forwarded to xgo")
+		if os.Getenv("GOPATH") == "" && !usesModules {
+			log.Fatalf("❌ No $GOPATH is set or forwarded to xgo")
 		}
-		for _, gopath := range strings.Split(os.Getenv("GOPATH"), string(os.PathListSeparator)) {
-			// Since docker sandboxes volumes, resolve any symlinks manually
-			sources := filepath.Join(gopath, "src")
-			filepath.Walk(sources, func(path string, info os.FileInfo, err error) error {
-				// Skip any folders that errored out
-				if err != nil {
-					log.Printf("Failed to access GOPATH element %s: %v", path, err)
+		if !usesModules {
+			for _, gopath := range strings.Split(os.Getenv("GOPATH"), string(os.PathListSeparator)) {
+				// Since docker sandboxes volumes, resolve any symlinks manually
+				sources := filepath.Join(gopath, "src")
+				filepath.Walk(sources, func(path string, info os.FileInfo, err error) error {
+					// Skip any folders that errored out
+					if err != nil {
+						log.Printf("❌ Failed to access GOPATH element %s: %v", path, err)
+						return nil
+					}
+					// Skip anything that's not a symlink
+					if info.Mode()&os.ModeSymlink == 0 {
+						return nil
+					}
+					// Resolve the symlink and skip if it's not a folder
+					target, err := filepath.EvalSymlinks(path)
+					if err != nil {
+						return nil
+					}
+					if info, err = os.Stat(target); err != nil || !info.IsDir() {
+						return nil
+					}
+					// Skip if the symlink points within GOPATH
+					if filepath.HasPrefix(target, sources) {
+						return nil
+					}
+
+					// Folder needs explicit mounting due to docker symlink security
+					locals = append(locals, target)
+					mounts = append(mounts, filepath.Join("/ext-go", strconv.Itoa(len(locals)), "src", strings.TrimPrefix(path, sources)))
+					paths = append(paths, filepath.ToSlash(filepath.Join("/ext-go", strconv.Itoa(len(locals)))))
 					return nil
-				}
-				// Skip anything that's not a symlink
-				if info.Mode()&os.ModeSymlink == 0 {
-					return nil
-				}
-				// Resolve the symlink and skip if it's not a folder
-				target, err := filepath.EvalSymlinks(path)
-				if err != nil {
-					return nil
-				}
-				if info, err = os.Stat(target); err != nil || !info.IsDir() {
-					return nil
-				}
-				// Skip if the symlink points within GOPATH
-				if filepath.HasPrefix(target, sources) {
-					return nil
-				}
-				// Folder needs explicit mounting due to docker symlink security
-				locals = append(locals, target)
-				mounts = append(mounts, filepath.Join("/ext-go", strconv.Itoa(len(locals)), "src", strings.TrimPrefix(path, sources)))
-				paths = append(paths, filepath.Join("/ext-go", strconv.Itoa(len(locals))))
-				return nil
-			})
-			// Export the main mount point for this GOPATH entry
-			locals = append(locals, sources)
-			mounts = append(mounts, filepath.Join("/ext-go", strconv.Itoa(len(locals)), "src"))
-			paths = append(paths, filepath.Join("/ext-go", strconv.Itoa(len(locals))))
+				})
+				// Export the main mount point for this GOPATH entry
+				locals = append(locals, sources)
+				mounts = append(mounts, filepath.Join("/ext-go", strconv.Itoa(len(locals)), "src"))
+				paths = append(paths, filepath.ToSlash(filepath.Join("/ext-go", strconv.Itoa(len(locals)))))
+			}
 		}
 	}
 	// Assemble and run the cross compilation command
-	fmt.Printf("Cross compiling %s...\n", config.Repository)
+	fmt.Printf("🏃 Cross compiling %s...\n", config.Repository)
 
 	args := []string{
 		"run", "--rm",
@@ -299,12 +299,37 @@ func compile(image string, config *ConfigFlags, flags *BuildFlags, folder string
 		"-e", fmt.Sprintf("FLAG_BUILDMODE=%s", flags.Mode),
 		"-e", "TARGETS=" + strings.Replace(strings.Join(config.Targets, " "), "*", ".", -1),
 	}
-	for i := 0; i < len(locals); i++ {
-		args = append(args, []string{"-v", fmt.Sprintf("%s:%s:ro", locals[i], mounts[i])}...)
+	if usesModules {
+		args = append(args, []string{"-e", "GO111MODULE=on"}...)
+		if *goProxy != "" {
+			args = append(args, []string{"-e", fmt.Sprintf("GOPROXY=%s", *goProxy)}...)
+		}
+
+		// Map this repository to the /source folder
+		absRepository, err := filepath.Abs(config.Repository)
+		if err != nil {
+			log.Fatalf("❌ Failed to locate requested module repository: %v.", err)
+		}
+		args = append(args, []string{"-v", absRepository + ":/source"}...)
+
+		fmt.Printf("✅ Enabled Go module support\n")
+
+		// Check whether it has a vendor folder, and if so, use it
+		vendorPath := absRepository + "/vendor"
+		vendorfolder, err := os.Stat(vendorPath)
+		if !os.IsNotExist(err) && vendorfolder.Mode().IsDir() {
+			args = append(args, []string{"-e", "FLAG_MOD=vendor"}...)
+			fmt.Printf("✅ Using vendored Go module dependencies\n")
+		}
+	} else {
+		for i := 0; i < len(locals); i++ {
+			args = append(args, []string{"-v", fmt.Sprintf("%s:%s:ro", locals[i], mounts[i])}...)
+		}
+		args = append(args, []string{"-e", "EXT_GOPATH=" + strings.Join(paths, ":")}...)
 	}
-	args = append(args, []string{"-e", "EXT_GOPATH=" + strings.Join(paths, ":")}...)
 
 	args = append(args, []string{image, config.Repository}...)
+	fmt.Printf("🐳 Docker %s\n", strings.Join(args, " "))
 	return run(exec.Command("docker", args...))
 }
 
@@ -338,7 +363,7 @@ func compileContained(config *ConfigFlags, flags *BuildFlags, folder string) err
 		env = append(env, "EXT_GOPATH=/non-existent-path-to-signal-local-build")
 	}
 	// Assemble and run the local cross compilation command
-	fmt.Printf("Cross compiling %s...\n", config.Repository)
+	fmt.Printf("🏃 Cross compiling %s...\n", config.Repository)
 
 	cmd := exec.Command("/build.sh", config.Repository)
 	cmd.Env = append(os.Environ(), env...)
@@ -351,15 +376,15 @@ func compileContained(config *ConfigFlags, flags *BuildFlags, folder string) err
 func resolveImportPath(path string) string {
 	abs, err := filepath.Abs(path)
 	if err != nil {
-		log.Fatalf("Failed to locate requested package: %v.", err)
+		log.Fatalf("❌ Failed to locate requested package: %v.", err)
 	}
 	stat, err := os.Stat(abs)
 	if err != nil || !stat.IsDir() {
-		log.Fatalf("Requested path invalid.")
+		log.Fatalf("❌ Requested path invalid.")
 	}
 	pack, err := build.ImportDir(abs, build.FindOnly)
 	if err != nil {
-		log.Fatalf("Failed to resolve import path: %v.", err)
+		log.Fatalf("❌ Failed to resolve import path: %v.", err)
 	}
 	return pack.ImportPath
 }
