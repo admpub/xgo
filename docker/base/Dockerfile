@@ -21,7 +21,7 @@ ADD fetch.sh /fetch.sh
 ENV FETCH /fetch.sh
 RUN chmod +x $FETCH
 
-
+# RUN cp /etc/apt/sources.list /etc/apt/sources.list.bak
 # Using aliyun mirrors
 RUN \
   echo \
