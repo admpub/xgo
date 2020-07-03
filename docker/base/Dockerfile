@@ -21,6 +21,23 @@ ADD fetch.sh /fetch.sh
 ENV FETCH /fetch.sh
 RUN chmod +x $FETCH
 
+
+# Using aliyun mirrors
+RUN \
+  echo \
+    "deb http://mirrors.aliyun.com/ubuntu/ xenial main restricted universe multiverse\n"\
+    "deb http://mirrors.aliyun.com/ubuntu/ xenial-security main restricted universe multiverse\n"\
+    "deb http://mirrors.aliyun.com/ubuntu/ xenial-updates main restricted universe multiverse\n"\
+    "deb http://mirrors.aliyun.com/ubuntu/ xenial-proposed main restricted universe multiverse\n"\
+    "deb http://mirrors.aliyun.com/ubuntu/ xenial-backports main restricted universe multiverse\n"\
+    "deb-src http://mirrors.aliyun.com/ubuntu/ xenial main restricted universe multiverse\n"\
+    "deb-src http://mirrors.aliyun.com/ubuntu/ xenial-security main restricted universe multiverse\n"\
+    "deb-src http://mirrors.aliyun.com/ubuntu/ xenial-updates main restricted universe multiverse\n"\
+    "deb-src http://mirrors.aliyun.com/ubuntu/ xenial-proposed main restricted universe multiverse\n"\
+    "deb-src http://mirrors.aliyun.com/ubuntu/ xenial-backports main restricted universe multiverse\n"\
+  >> /etc/apt/sources.list
+
+
 # Make sure apt-get is up to date and dependent packages are installed
 RUN \
   apt-get update && \
