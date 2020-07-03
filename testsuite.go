@@ -27,8 +27,8 @@ var layers = []struct {
 	dir string
 }{
 	{"admpub/xgo:base", "base"},
-	{"admpub/xgo:1.13.3", "go-1.13.3"},
-	{"admpub/xgo:latest", "go-latest"},
+	//{"admpub/xgo:1.13.3", "go-1.13/go-1.13.3"},
+	{"admpub/xgo:latest", "go-1.14/go-1.14.4"},
 }
 
 // tests defaines all the input test cases and associated arguments the cross
