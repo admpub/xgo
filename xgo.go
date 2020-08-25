@@ -376,15 +376,15 @@ func compileContained(config *ConfigFlags, flags *BuildFlags, folder string) err
 func resolveImportPath(path string) string {
 	abs, err := filepath.Abs(path)
 	if err != nil {
-		log.Fatalf("❌ Failed to locate requested package: %v.", err)
+		log.Fatalf("❌ Failed to locate requested package: %v", err)
 	}
 	stat, err := os.Stat(abs)
 	if err != nil || !stat.IsDir() {
-		log.Fatalf("❌ Requested path invalid.")
+		log.Fatalf("❌ Requested path invalid: %v", abs)
 	}
 	pack, err := build.ImportDir(abs, build.FindOnly)
 	if err != nil {
-		log.Fatalf("❌ Failed to resolve import path: %v.", err)
+		log.Fatalf("❌ Failed to resolve import path: %v", err)
 	}
 	return pack.ImportPath
 }
