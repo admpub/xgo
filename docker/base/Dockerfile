@@ -70,7 +70,7 @@ RUN \
   git clone https://github.com/tpoechtrager/osxcross.git && \
   cd osxcross && git checkout 88cb6e8d0d7675cae7c8a2d66c11f58237101df0 && cd ../ && \
   mv  $OSX_SDK.tar.xz /osxcross/tarballs/ && \
-  OSX_VERSION_MIN=10.10 UNATTENDED=1 LD_LIBRARY_PATH=/osxcross/target/lib /osxcross/build.sh
+  OSX_VERSION_MIN=10.11 UNATTENDED=1 LD_LIBRARY_PATH=/osxcross/target/lib /osxcross/build.sh
 
 ENV PATH /osxcross/target/bin:$PATH
 
