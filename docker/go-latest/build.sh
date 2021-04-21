@@ -1,7 +1,7 @@
-export GO_LATEST_VERSION=1.15.8
-export GO_DOCKERFILE_DIR=go-1.15
+export GO_LATEST_VERSION=1.16.3
+export GO_DOCKERFILE_DIR=./
 docker build -t admpub/xgo:${GO_LATEST_VERSION} .
-#docker build -t admpub/xgo:${GO_LATEST_VERSION} -f ./${GO_DOCKERFILE_DIR}/go-${GO_LATEST_VERSION}/Dockerfile .
+#docker build -t admpub/xgo:${GO_LATEST_VERSION} -f ${GO_DOCKERFILE_DIR}go-${GO_LATEST_VERSION}/Dockerfile .
 #推送到仓库：docker push admpub/xgo:${GO_LATEST_VERSION}
 #修改名称：docker tag IMAGEID(镜像id) REPOSITORY:TAG（仓库：标签）
 #提交修改：docker commit -m "提交说明" -a "用户描述" 容器ID admpub/xgo:2.0.0
