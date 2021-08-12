@@ -104,10 +104,8 @@ func main() {
 			image = *dockerImage
 		}
 		// Check that all required images are available
-		found, err := checkDockerImage(image)
+		found := checkDockerImage(image)
 		switch {
-		case err != nil:
-			log.Fatalf("❌ Failed to check docker image availability: %v.", err)
 		case !found:
 			fmt.Println("not found!")
 			if err := pullDockerImage(image); err != nil {
@@ -203,15 +201,10 @@ func checkDocker() error {
 }
 
 // Checks whether a required docker image is available locally.
-func checkDockerImage(image string) (bool, error) {
+func checkDockerImage(image string) bool {
 	fmt.Printf("🐳 Checking for required docker image %s... ", image)
-	// out, err := exec.Command("docker", "images", "--no-trunc").Output()
-	// if err != nil {
-	// 	return false, err
-	// }
-	// return bytes.Contains(out, []byte(image)), nil
 	err := exec.Command("docker", "image", "inspect", image).Run()
-	return err == nil, err
+	return err == nil
 }
 
 // Pulls an image from the docker registry.
