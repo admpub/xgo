@@ -1,4 +1,4 @@
-export GO_LATEST_VERSION=1.16.3
+export GO_LATEST_VERSION=1.16.7
 export GO_DOCKERFILE_DIR=./
 docker build -t admpub/xgo:${GO_LATEST_VERSION} .
 #docker build -t admpub/xgo:${GO_LATEST_VERSION} -f ${GO_DOCKERFILE_DIR}go-${GO_LATEST_VERSION}/Dockerfile .

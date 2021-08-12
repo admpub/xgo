@@ -1,9 +1,9 @@
 FROM admpub/xgo:base
 
-ENV GO_VERSION 1163
+ENV GO_VERSION 1167
 
 RUN \
-  export ROOT_DIST=https://golang.org/dl/go1.16.3.linux-amd64.tar.gz && \
-  export ROOT_DIST_SHA=951a3c7c6ce4e56ad883f97d9db74d3d6d80d5fec77455c6ada6c1f7ac4776d2 && \
+  export ROOT_DIST=https://golang.org/dl/go1.16.7.linux-amd64.tar.gz && \
+  export ROOT_DIST_SHA=7fe7a73f55ba3e2285da36f8b085e5c0159e9564ef5f63ee0ed6b818ade8ef04 && \
   \
 $BOOTSTRAP_PURE

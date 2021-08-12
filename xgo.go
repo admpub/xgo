@@ -8,7 +8,6 @@
 package main
 
 import (
-	"bytes"
 	"flag"
 	"fmt"
 	"go/build"
@@ -206,11 +205,13 @@ func checkDocker() error {
 // Checks whether a required docker image is available locally.
 func checkDockerImage(image string) (bool, error) {
 	fmt.Printf("🐳 Checking for required docker image %s... ", image)
-	out, err := exec.Command("docker", "images", "--no-trunc").Output()
-	if err != nil {
-		return false, err
-	}
-	return bytes.Contains(out, []byte(image)), nil
+	// out, err := exec.Command("docker", "images", "--no-trunc").Output()
+	// if err != nil {
+	// 	return false, err
+	// }
+	// return bytes.Contains(out, []byte(image)), nil
+	err := exec.Command("docker", "image", "inspect", image).Run()
+	return err == nil, err
 }
 
 // Pulls an image from the docker registry.
