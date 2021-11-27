@@ -1,7 +1,7 @@
 ARG DEBIAN_VERSION="bullseye-slim"
 ARG CC_CXX_VERSION="10"
 ARG OSX_SDK="MacOSX11.1.sdk"
-ARG OSX_SDK_URL="https://github.com/larskanis/MacOSX-SDKs/releases/download/11.1/${OSX_SDK}.tar.xz"
+ARG OSX_SDK_URL="https://hub.fastgit.org/larskanis/MacOSX-SDKs/releases/download/11.1/${OSX_SDK}.tar.xz"
 ARG OSX_CROSS_COMMIT="035cc170338b7b252e3f13b0e3ccbf4411bffc41"
 #ARG LLVM_MINGW_URL="https://github.com/mstorsjo/llvm-mingw/releases/download/20210816/llvm-mingw-20210816-msvcrt-ubuntu-18.04-x86_64.tar.xz"
 
@@ -92,7 +92,7 @@ RUN tar -cf - $OSX_SDK/ | xz -c - > $OSX_SDK.tar.xz \
 
 ENV LD_LIBRARY_PATH="/osxcross/target/lib"
 ARG OSX_CROSS_COMMIT
-RUN git clone https://github.com/tpoechtrager/osxcross.git \
+RUN git clone https://hub.fastgit.org/tpoechtrager/osxcross.git \
   && cd osxcross \
   && git reset --hard $OSX_CROSS_COMMIT \
   && cd ../ \
@@ -112,7 +112,7 @@ RUN apt-get update \
   && find /var/log -type f | while read f; do echo -ne '' > $f; done;
 
 # semver tool
-RUN curl -sSLk https://raw.githubusercontent.com/fsaintjacques/semver-tool/master/src/semver -o /usr/local/bin/semver \
+RUN curl -sSLk https://raw.fastgit.org/fsaintjacques/semver-tool/master/src/semver -o /usr/local/bin/semver \
   && chmod +x /usr/local/bin/semver
 
 ENV XGO_IN_XGO="1"\
