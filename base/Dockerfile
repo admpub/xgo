@@ -92,7 +92,7 @@ RUN tar -cf - $OSX_SDK/ | xz -c - > $OSX_SDK.tar.xz \
 
 ENV LD_LIBRARY_PATH="/osxcross/target/lib"
 ARG OSX_CROSS_COMMIT
-RUN git clone https://hub.fastgit.org/tpoechtrager/osxcross.git \
+RUN git clone https://github.com/tpoechtrager/osxcross.git \
   && cd osxcross \
   && git reset --hard $OSX_CROSS_COMMIT \
   && cd ../ \
