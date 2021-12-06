@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.2
-ARG BASE_IMAGE=ghcr.io/crazy-max/xgo:base
+ARG BASE_IMAGE=admpub/xgo:base
 ARG GO_VERSION
 ARG GO_DIST_URL
 ARG GO_DIST_SHA
