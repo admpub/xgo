@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.2
-ARG BASE_IMAGE=admpub/xgo:base
+ARG BASE_IMAGE=ghcr.io/crazy-max/xgo:base
 ARG GO_VERSION
 ARG GO_DIST_URL
 ARG GO_DIST_SHA
@@ -7,6 +7,7 @@ ARG GO_DIST_SHA
 FROM --platform=${BUILDPLATFORM:-linux/amd64} crazymax/goreleaser-xx:latest AS goreleaser-xx
 FROM --platform=${BUILDPLATFORM:-linux/amd64} golang:1.17-alpine AS xgo-base
 COPY --from=goreleaser-xx / /
+
 RUN apk add --no-cache ca-certificates curl file gcc git linux-headers musl-dev tar
 WORKDIR /src
 
@@ -36,4 +37,12 @@ ARG GO_DIST_SHA
 ARG GO_DIST_URL="https://golang.org/dl/go${GO_VERSION}.linux-amd64.tar.gz"
 ENV GO_VERSION=${GO_VERSION}
 COPY --from=xgo-build /usr/local/bin/xgo /usr/local/bin/xgo
+
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends libzbar-dev \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+  && find /var/log -type f | while read f; do echo -ne '' > $f; done;
+
 RUN xgo-bootstrap-pure

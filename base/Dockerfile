@@ -73,7 +73,6 @@ RUN apt-get update \
     wget \
     xz-utils \
     zip \
-    libzbar-dev \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
   && ln -s /usr/include/asm-generic /usr/include/asm \
