@@ -38,7 +38,7 @@ ARG GO_DIST_URL="https://golang.org/dl/go${GO_VERSION}.linux-amd64.tar.gz"
 ENV GO_VERSION=${GO_VERSION}
 COPY --from=xgo-build /usr/local/bin/xgo /usr/local/bin/xgo
 
-
+# added by admpub
 RUN apt-get update \
   && apt-get install -y --no-install-recommends libzbar-dev \
   && apt-get clean \
