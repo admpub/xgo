@@ -40,7 +40,7 @@ COPY --from=xgo-build /usr/local/bin/xgo /usr/local/bin/xgo
 
 # added by admpub
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends libzbar-dev libdbus-1-dev \
+  && apt-get install -y --no-install-recommends libzbar-dev \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
   && find /var/log -type f | while read f; do echo -ne '' > $f; done;
