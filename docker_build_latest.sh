@@ -1,5 +1,5 @@
-declare -a GO_VERSION="1.17.6"
-declare -a GO_DIST_SHA="231654bbf2dab3d86c1619ce799e77b03d96f9b50770297c8f4dff8836fc8ca2"
+declare -a GO_VERSION="1.19.3"
+declare -a GO_DIST_SHA="74b9640724fd4e6bb0ed2a1bc44ae813a03f1e72a4c76253e2d5c015494430ba"
 #declare -a GO_DIST_URL="https://studygolang.com/dl/golang/go${GO_VERSION}.linux-amd64.tar.gz"
 declare -a GO_DIST_URL="https://golang.google.cn/dl/go${GO_VERSION}.linux-amd64.tar.gz"
 docker build \
