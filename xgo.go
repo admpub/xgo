@@ -23,6 +23,7 @@ import (
 
 var version = "dev"
 var depsCache = filepath.Join(os.TempDir(), "xgo-cache")
+var dockerCli = "docker"
 
 // Cross compilation docker containers
 var dockerBase = "admpub/xgo:base"
@@ -194,6 +195,11 @@ func main() {
 func checkDocker() error {
 	fmt.Println("🐳 Checking docker installation...")
 	if err := run(exec.Command("docker", "version")); err != nil {
+		if err := run(exec.Command("podman", "version")); err == nil {
+			dockerCli = "podman"
+			fmt.Println()
+			return nil
+		}
 		return err
 	}
 	fmt.Println()
@@ -203,14 +209,14 @@ func checkDocker() error {
 // Checks whether a required docker image is available locally.
 func checkDockerImage(image string) bool {
 	fmt.Printf("🐳 Checking for required docker image %s... ", image)
-	err := exec.Command("docker", "image", "inspect", image).Run()
+	err := exec.Command(dockerCli, "image", "inspect", image).Run()
 	return err == nil
 }
 
 // Pulls an image from the docker registry.
 func pullDockerImage(image string) error {
 	fmt.Printf("🐳 Pulling %s from docker registry...\n", image)
-	return run(exec.Command("docker", "pull", image))
+	return run(exec.Command(dockerCli, "pull", image))
 }
 
 // compile cross builds a requested package according to the given build specs
@@ -324,7 +330,7 @@ func compile(image string, config *ConfigFlags, flags *BuildFlags, folder string
 
 	args = append(args, []string{image, config.Repository}...)
 	fmt.Printf("🐳 Docker %s\n", strings.Join(args, " "))
-	return run(exec.Command("docker", args...))
+	return run(exec.Command(dockerCli, args...))
 }
 
 // compileContained cross builds a requested package according to the given build
