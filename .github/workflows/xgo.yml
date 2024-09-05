@@ -1,5 +1,9 @@
 name: xgo
 
+concurrency:
+  group: xgo-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches:
@@ -14,40 +18,45 @@ on:
     paths-ignore:
       - '**.md'
 
+env:
+  DESTDIR: ./bin
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       -
         name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v3
       -
         name: Build artifacts
-        uses: docker/bake-action@v1
+        uses: docker/bake-action@v5
         with:
           targets: artifact-all
+          provenance: false
       -
-        name: Move artifacts
-        run: |
-          mv ./dist/**/* ./dist/
+        name: Release
+        uses: docker/bake-action@v5
+        with:
+          targets: release
+          provenance: false
       -
         name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: xgo
-          path: ./dist/*
+          path: ${{ env.DESTDIR }}/release/*
           if-no-files-found: error
       -
         name: GitHub Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/v')
         with:
           draft: true
           files: |
-            dist/*.tar.gz
-            dist/*.zip
+            ${{ env.DESTDIR }}/release/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

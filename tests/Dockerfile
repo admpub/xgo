@@ -1,7 +1,8 @@
-# syntax=docker/dockerfile:1.2
-ARG BASE_IMAGE=ghcr.io/crazy-max/xgo:1.17.x
+# syntax=docker/dockerfile:1
+
+ARG BASE_IMAGE=ghcr.io/crazy-max/xgo:1.17
 ARG PROJECT="./c"
-ARG BRANCH=""
+ARG BRANCH
 
 FROM ${BASE_IMAGE} AS base
 WORKDIR /src
@@ -13,5 +14,5 @@ RUN --mount=type=bind,source=.,target=/src,rw \
     .*)  echo "."                ;; \
     *)   echo "$PROJECT"         ;; esac) \
   && if [ "$ROOTPATH" = "." ]; then cd $PROJECT; fi \
-  && xgo -targets="*/*" -branch="$BRANCH" -out="test" $ROOTPATH \
+  && xgo -targets="*/*" -buildvcs="true" -branch="$BRANCH" -out="test" $ROOTPATH \
   && ls -al /build

@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 #
 # Contains the a dependency builder to iterate over all installed dependencies
 # and cross compile them to the requested target platform.
@@ -15,7 +16,7 @@ set -e
 rm -rf /deps-build && cp -r $1 /deps-build
 
 # Build all the dependencies (no order for now)
-for dep in `ls /deps-build`; do
+for dep in $(ls /deps-build); do
 	echo "Configuring dependency $dep for $HOST..."
 	(cd /deps-build/$dep && ./configure --disable-shared --host=$HOST --prefix=$PREFIX --silent ${@:2})
 

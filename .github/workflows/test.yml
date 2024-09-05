@@ -1,18 +1,21 @@
 name: test
 
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches:
       - 'master'
-    tags:
-      - '*'
     paths-ignore:
       - '**.md'
   pull_request:
-    branches:
-      - 'master'
     paths-ignore:
       - '**.md'
+
+env:
+  PLATFORMS: linux/amd64,linux/arm64
 
 jobs:
   test:
@@ -21,53 +24,34 @@ jobs:
       fail-fast: false
       matrix:
         go_version:
-          - 1.17
-          - 1.16
+          - 1.23.0
+          - 1.22.6
         case:
           - c
           - cpp
           - gorm
           - ffmerger
-          - goethereum
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v2
-      -
-        name: Cache Docker layers
-        uses: actions/cache@v2
-        with:
-          path: /tmp/.xgo-cache
-          key: ${{ runner.os }}-xgo-base-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-xgo-base-
+        uses: actions/checkout@v4
       -
         name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v3
         with:
           driver: docker
       -
-        name: Build base
-        uses: docker/bake-action@v1
+        name: Build xgo
+        uses: docker/bake-action@v5
         with:
-          targets: base
-          set: |
-            *.tags=xgo:base
-            *.output=type=docker
-            *.cache-from=type=local,src=/tmp/.xgo-cache
-      -
-        name: Bootstrap ${{ matrix.go_version }}
-        uses: docker/bake-action@v1
-        with:
-          targets: go-${{ matrix.go_version }}
+          targets: image
           set: |
             *.tags=xgo:${{ matrix.go_version }}
+            *.args.GO_VERSION=${{ matrix.go_version }}
             *.output=type=docker
-        env:
-          BASE_IMAGE: xgo:base
       -
-        name: Test ${{ matrix.case }} for go-${{ matrix.go_version }}
-        uses: docker/bake-action@v1
+        name: Test ${{ matrix.case }} for go ${{ matrix.go_version }}
+        uses: docker/bake-action@v5
         with:
           targets: test-${{ matrix.case }}
         env:
